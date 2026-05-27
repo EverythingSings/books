@@ -58,15 +58,6 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         <a href="https://everythingsings.art" rel="me">"\u{2190} everythingsings.art"</a>
                         <a href="/feed.xml">"RSS"</a>
                     </nav>
-                    <aside class="kindle-callout">
-                        <p class="kc-eyebrow">"Also available as a book"</p>
-                        <p class="kc-body">
-                            "The first 101 reviews are collected in a Kindle edition."
-                        </p>
-                        <a class="kc-cta" href="https://www.amazon.com/dp/B0BTXZPBYF" rel="noopener external">
-                            "Read on Amazon \u{2192}"
-                        </a>
-                    </aside>
                 </header>
                 <ol class="entries" reversed=false>
                     {entries}
