@@ -1,0 +1,34 @@
+[package]
+name = "books"
+version = "0.1.0"
+edition = "2021"
+description = "Personal book reviews — books.everythingsings.art"
+license = "MIT"
+
+[lib]
+crate-type = ["rlib"]
+
+[[bin]]
+name = "books"
+path = "src/main.rs"
+
+[[bin]]
+name = "import"
+path = "src/bin/import.rs"
+
+[dependencies]
+leptos = { version = "0.7", features = ["ssr"] }
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+ureq = { version = "2.10", default-features = false, features = ["tls"] }
+serde_json = "1"
+
+[features]
+default = []
+ssr = ["leptos/ssr"]
+
+[profile.release]
+lto = true
+opt-level = "z"
+codegen-units = 1

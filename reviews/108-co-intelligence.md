@@ -1,0 +1,16 @@
++++
+number = 108
+title = "Co-Intelligence"
+author = "Ethan Mollick"
+date = "2024-07-12"
+date_raw = "12th July 2024"
+link = "https://books.google.com/books/about/Co_Intelligence.html?id=J2HgEAAAQBAJ"
++++
+
+I listened to this book as an audiobook, and while the author's pronunciation was occasionally difficult to understand, it didn't significantly detract from the overall experience. However, it's worth noting if you prefer reading for clarity.
+
+The book offers a thorough exploration of our evolving AI landscape, blending perspectives from both academia and business. While some concepts weren't entirely new to me, the content remained consistently engaging. The author covered a broad spectrum of ideas, making it a solid recommendation for those new to the subject of AI and its implications for our world.
+
+The author's effort to ensure accuracy was evident, a hallmark of his academic background, which is particularly challenging given the rapidly changing nature of AI. Towards the end, he delved into future projections, presenting various possible outcomes. I appreciated this forward-looking approach, although I felt this section could have been more comprehensive. It wasn’t that there were errors, but rather that the exploration wasn't as exhaustive as I would have preferred.
+
+This book rekindled my interest in far-future predictions and has inspired me to further my study in Futurology. I’m now eager to seek out more advanced material on the subject.
