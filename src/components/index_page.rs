@@ -4,6 +4,19 @@ use crate::components::head::html_escape;
 use crate::parser::Review;
 use leptos::prelude::*;
 
+/// Trim a plain-text body to roughly `chars` characters at a word boundary
+/// and append an ellipsis if anything was cut.
+fn truncate_excerpt(text: &str, chars: usize) -> String {
+    if text.chars().count() <= chars {
+        return text.to_string();
+    }
+    let head: String = text.chars().take(chars).collect();
+    match head.rsplit_once(' ') {
+        Some((before_last_space, _)) => format!("{}…", before_last_space.trim_end()),
+        None => format!("{head}…"),
+    }
+}
+
 #[component]
 pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
     let total = reviews.len();
@@ -15,6 +28,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
             let author = r.author.clone();
             let date = r.date_display.clone();
             let n = r.number;
+            let preview = truncate_excerpt(&r.body_text, 220);
             view! {
                 <li class="entry">
                     <a class="entry-link" href=href>
@@ -24,6 +38,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                             <span class="entry-author">{author}</span>
                         })}
                         <span class="entry-date">{date}</span>
+                        <span class="entry-preview">{preview}</span>
                     </a>
                 </li>
             }
