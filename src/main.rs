@@ -121,7 +121,7 @@ fn render_index_page(reviews: &[Review]) -> String {
         description: SITE_DESCRIPTION.to_string(),
         canonical_url: format!("{SITE_URL}/"),
         og_type: "website".to_string(),
-        og_image: format!("{SITE_URL}/og-cover.png"),
+        og_image: format!("{SITE_URL}/header.jpg"),
         json_ld: site_index_json_ld(),
     });
     let body = IndexPage(IndexPageProps {
@@ -149,7 +149,7 @@ fn render_review_page(
     let canonical = format!("{SITE_URL}/reviews/{}/", review.slug);
     let og_image = cover_path
         .map(|p| format!("{SITE_URL}{p}"))
-        .unwrap_or_else(|| format!("{SITE_URL}/og-cover.png"));
+        .unwrap_or_else(|| format!("{SITE_URL}/header.jpg"));
     let excerpt: String = review.body_text.chars().take(280).collect();
     let description = if excerpt.is_empty() {
         format!("Review of {} by {}", review.title, review.author)

@@ -34,6 +34,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
         <body itemscope itemtype="https://schema.org/Blog">
             <main class="container">
                 <header class="site-header">
+                    <img class="site-hero" src="/header.jpg" alt="" loading="eager" />
                     <h1 class="site-title">"Book Reviews"</h1>
                     <p class="site-subtitle">
                         "A personal reading journal. Books are time capsules — these are mine."
