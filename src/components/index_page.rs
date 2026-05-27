@@ -47,13 +47,20 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
 
     view! {
         <body itemscope itemtype="https://schema.org/Blog">
-            <img class="site-banner" src="/header.jpg" alt="" loading="eager" />
+            <header class="site-hero" role="banner">
+                <div class="site-hero-bg" aria-hidden="true"></div>
+                <div class="site-hero-content">
+                    <h1 class="site-title">"Book Reviews"</h1>
+                    <dl class="era-list">
+                        <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
+                        <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>
+                        <dt>"2023–2024"</dt><dd>"AI, design & creativity"</dd>
+                        <dt>"2024–2026"</dt><dd><em>"\u{201C}stealth mode\u{201D}"</em></dd>
+                    </dl>
+                </div>
+            </header>
             <main class="container">
                 <header class="site-header">
-                    <h1 class="site-title">"Book Reviews"</h1>
-                    <p class="site-subtitle">
-                        "A personal reading journal. Books are time capsules — these are mine."
-                    </p>
                     <nav class="site-nav">
                         <a href="https://everythingsings.art" rel="me">"\u{2190} everythingsings.art"</a>
                         <a href="/feed.xml">"RSS"</a>

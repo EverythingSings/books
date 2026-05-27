@@ -23,7 +23,10 @@ pub fn generate_head_html(meta: &PageMeta) -> String {
 <meta name="description" content="{description}" />
 <meta name="author" content="{author}" />
 <link rel="canonical" href="{url}" />
-<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <meta name="theme-color" content="{theme}" />
 <meta property="og:type" content="{og_type}" />
 <meta property="og:title" content="{title}" />

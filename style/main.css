@@ -71,20 +71,87 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
 
 .site-header { margin-bottom: var(--space-5); max-width: var(--measure); }
 
-/* Edge-to-edge generative-art banner above the masthead.
-   The source image is portrait — object-fit crops it into a landscape strip,
-   object-position keeps the visually-interesting middle section in view. */
-.site-banner {
-  display: block;
+/* ---- Parallax hero with the generative-art image ----
+   The image lives on a dedicated layer so we can use background-attachment:fixed
+   for parallax without losing the local-positioning we want elsewhere. iOS
+   Safari treats fixed as scroll, which is a fine fallback. */
+.site-hero {
+  position: relative;
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  object-position: center 35%;
+  min-height: 64vh;
+  max-height: 720px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
   margin: 0;
   border-bottom: 1px solid var(--rule);
 }
+.site-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/header.jpg");
+  background-size: cover;
+  background-position: center 28%;
+  background-attachment: fixed;
+  background-color: #0a0a0a;
+  /* Fade the bottom so the title sits on something readable. */
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgba(0,0,0,0.55) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgba(0,0,0,0.55) 100%);
+}
+.site-hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--measure-wide);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-3) var(--space-4);
+  color: #f4f0e6;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+}
+.site-hero-content .site-title {
+  color: #fff;
+  margin: 0 0 var(--space-3);
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+}
+
+.era-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.2rem;
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+}
+.era-list dt {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  align-self: baseline;
+}
+.era-list dd {
+  margin: 0;
+  color: #e8e4d8;
+  align-self: baseline;
+}
+.era-list em {
+  font-style: italic;
+  opacity: 0.85;
+}
+
 @media (max-width: 520px) {
-  .site-banner { height: 120px; }
+  .site-hero { min-height: 56vh; }
+  .site-hero-content { padding: var(--space-4) var(--space-2) var(--space-3); }
+  .site-hero-content .site-title { font-size: 2.25rem; }
+  .era-list { font-size: 0.875rem; gap: 0.3rem 0.8rem; }
+  /* iOS already falls back to scroll, but make it explicit for any other
+     mobile browser where fixed feels janky. */
+  .site-hero-bg { background-attachment: scroll; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-hero-bg { background-attachment: scroll; }
 }
 .site-title { font-size: 2.5rem; margin: 0 0 var(--space-2); font-weight: 700; letter-spacing: -0.02em; }
 .site-subtitle { color: var(--fg-muted); font-style: italic; margin: 0 0 var(--space-3); }
