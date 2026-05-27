@@ -70,14 +70,21 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
 /* ------- Index page ------- */
 
 .site-header { margin-bottom: var(--space-5); max-width: var(--measure); }
-.site-hero {
+
+/* Edge-to-edge generative-art banner above the masthead.
+   The source image is portrait — object-fit crops it into a landscape strip,
+   object-position keeps the visually-interesting middle section in view. */
+.site-banner {
   display: block;
   width: 100%;
-  max-width: 320px;
-  height: auto;
-  margin: 0 0 var(--space-3);
-  border-radius: 4px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  height: 180px;
+  object-fit: cover;
+  object-position: center 35%;
+  margin: 0;
+  border-bottom: 1px solid var(--rule);
+}
+@media (max-width: 520px) {
+  .site-banner { height: 120px; }
 }
 .site-title { font-size: 2.5rem; margin: 0 0 var(--space-2); font-weight: 700; letter-spacing: -0.02em; }
 .site-subtitle { color: var(--fg-muted); font-style: italic; margin: 0 0 var(--space-3); }
