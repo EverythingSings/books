@@ -1,7 +1,7 @@
 //! Index page: chronological list of all reviews.
 
 use crate::components::head::html_escape;
-use crate::parser::Review;
+use crate::parser::{today_display, Review};
 use leptos::prelude::*;
 
 /// Trim a plain-text body to roughly `chars` characters at a word boundary
@@ -20,11 +20,7 @@ fn truncate_excerpt(text: &str, chars: usize) -> String {
 #[component]
 pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
     let total = reviews.len();
-    let last_updated = reviews
-        .iter()
-        .max_by(|a, b| a.date.cmp(&b.date))
-        .map(|r| r.date_display.clone())
-        .unwrap_or_default();
+    let last_updated = today_display();
     let entries: Vec<_> = reviews
         .iter()
         .map(|r| {

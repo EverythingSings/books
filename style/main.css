@@ -151,6 +151,59 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
 }
 .hero-updated-date { color: #fff; font-weight: 500; }
 
+/* ---- Index-only: image extends behind the entire page, with the main
+   column sitting on a darker frosted-glass card. The image is atmospheric,
+   so we lock the index page to dark tokens regardless of OS color-scheme. */
+body[itemtype$="Blog"] {
+  --fg: #ece8db;
+  --fg-muted: #b0aca0;
+  --fg-faint: #807c70;
+  --bg-soft: rgba(255, 255, 255, 0.04);
+  --rule: rgba(255, 255, 255, 0.1);
+  --link: #f0ecdf;
+  --link-hover: #ffffff;
+  background: transparent;
+  color: var(--fg);
+}
+body[itemtype$="Blog"]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/header.jpg");
+  background-size: cover;
+  background-position: center 28%;
+  background-color: #0a0a0a;
+}
+/* Hero's image layer becomes a soft top vignette over the body image. */
+body[itemtype$="Blog"] .site-hero-bg {
+  background-image: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.2) 55%,
+    rgba(0, 0, 0, 0) 100%);
+  background-color: transparent;
+  background-attachment: scroll;
+  mask: none;
+  -webkit-mask: none;
+}
+body[itemtype$="Blog"] .site-hero { border-bottom: none; }
+
+body[itemtype$="Blog"] .container {
+  background: rgba(8, 8, 10, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  backdrop-filter: blur(22px) saturate(125%);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  /* Pull the card upward so it overlaps the hero edge for cohesion. */
+  margin-top: calc(-1 * var(--space-3));
+  position: relative;
+  z-index: 1;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body[itemtype$="Blog"] .container { background: rgba(8, 8, 10, 0.88); }
+}
+
 .era-list {
   display: grid;
   grid-template-columns: max-content 1fr;
