@@ -20,6 +20,11 @@ fn truncate_excerpt(text: &str, chars: usize) -> String {
 #[component]
 pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
     let total = reviews.len();
+    let last_updated = reviews
+        .iter()
+        .max_by(|a, b| a.date.cmp(&b.date))
+        .map(|r| r.date_display.clone())
+        .unwrap_or_default();
     let entries: Vec<_> = reviews
         .iter()
         .map(|r| {
@@ -50,13 +55,19 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
             <header class="site-hero" role="banner">
                 <div class="site-hero-bg" aria-hidden="true"></div>
                 <div class="site-hero-content">
-                    <h1 class="site-title">"Book Reviews"</h1>
-                    <dl class="era-list">
-                        <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
-                        <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>
-                        <dt>"2023–2024"</dt><dd>"AI, design & creativity"</dd>
-                        <dt>"2024–2026"</dt><dd><em>"\u{201C}stealth mode\u{201D}"</em></dd>
-                    </dl>
+                    <div class="hero-card">
+                        <h1 class="site-title">"Book Reviews"</h1>
+                        <dl class="era-list">
+                            <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
+                            <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>
+                            <dt>"2023–2024"</dt><dd>"AI, design & creativity"</dd>
+                            <dt>"2024–2026"</dt><dd><em>"\u{201C}stealth mode\u{201D}"</em></dd>
+                        </dl>
+                        <p class="hero-updated">
+                            <span class="hero-updated-label">"Last updated"</span>
+                            <span class="hero-updated-date">{last_updated}</span>
+                        </p>
+                    </div>
                 </div>
             </header>
             <main class="container">

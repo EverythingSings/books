@@ -106,7 +106,23 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
   margin: 0 auto;
   padding: var(--space-5) var(--space-3) var(--space-4);
   color: #f4f0e6;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+}
+/* Frosted-glass card so the title and era list stay readable over any image. */
+.hero-card {
+  display: inline-block;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(15, 15, 18, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+/* Browsers without backdrop-filter (older Firefox) get a more opaque panel. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero-card { background: rgba(15, 15, 18, 0.78); }
 }
 .site-hero-content .site-title {
   color: #fff;
@@ -114,6 +130,26 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
   font-size: 3rem;
   letter-spacing: -0.02em;
 }
+
+.hero-updated {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  color: #e8e4d8;
+}
+.hero-updated-label {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.hero-updated-date { color: #fff; font-weight: 500; }
 
 .era-list {
   display: grid;
@@ -146,6 +182,7 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
   .site-hero-content { padding: var(--space-4) var(--space-2) var(--space-3); }
   .site-hero-content .site-title { font-size: 2.25rem; }
   .era-list { font-size: 0.875rem; gap: 0.3rem 0.8rem; }
+  .hero-card { padding: var(--space-2) var(--space-3); display: block; }
   /* iOS already falls back to scroll, but make it explicit for any other
      mobile browser where fixed feels janky. */
   .site-hero-bg { background-attachment: scroll; }
