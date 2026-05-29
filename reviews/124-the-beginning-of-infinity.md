@@ -1,9 +1,9 @@
 +++
-number = 110
+number = 124
 title = "The Beginning of Infinity"
 author = "David Deutsch"
-date = "2026-03-28"
-date_raw = "28th March 2026"
+date = "2026-03-24"
+date_raw = "24th March 2026"
 +++
 
 "Problems are inevitable, and problems are soluble."

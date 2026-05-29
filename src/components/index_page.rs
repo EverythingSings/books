@@ -60,7 +60,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                             <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
                             <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>
                             <dt>"2023–2024"</dt><dd>"AI, design & creativity"</dd>
-                            <dt>"2024–2026"</dt><dd><em>"\u{201C}stealth mode\u{201D}"</em></dd>
+                            <dt>"2024–2025"</dt><dd>"the inward turn"</dd>
                         </dl>
                         <p class="hero-updated">
                             <span class="hero-updated-label">"Last updated"</span>

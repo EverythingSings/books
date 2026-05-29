@@ -1,9 +1,9 @@
 +++
-number = 111
+number = 126
 title = "The Coming Wave"
 author = "Mustafa Suleyman"
-date = "2026-04-28"
-date_raw = "28th April 2026"
+date = "2026-04-03"
+date_raw = "3rd April 2026"
 +++
 
 Technologists must remember, "with great power comes great responsibility". Technology has always been a tool, and tools can build or destroy, but the coming wave of AI and synthetic biology may be the first tools capable of outpacing the hands that built them.

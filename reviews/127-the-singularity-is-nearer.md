@@ -1,5 +1,5 @@
 +++
-number = 112
+number = 127
 title = "The Singularity is Nearer"
 author = "Ray Kurzweil"
 date = "2026-05-14"
