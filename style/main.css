@@ -499,3 +499,27 @@ body[itemtype$="Blog"] .container {
   .review-body { font-size: 1.05rem; }
   .container { padding: var(--space-3) var(--space-2); }
 }
+
+/* ------- Scroll progress (index spine) -------
+   CSS-only scroll-driven animation. Fills the accent bar at the top of
+   the viewport from 0 -> 100% as the reader moves through the spine.
+   In browsers without scroll-driven animation support, the bar stays
+   invisible (scaleX(0)) — graceful degradation. */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 100;
+  pointer-events: none;
+  animation: scroll-progress linear;
+  animation-timeline: scroll(root);
+}
+
+@keyframes scroll-progress {
+  to { transform: scaleX(1); }
+}

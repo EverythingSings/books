@@ -48,6 +48,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
 
     view! {
         <body itemscope itemtype="https://schema.org/Blog">
+            <div class="scroll-progress" aria-hidden="true"></div>
             <header class="site-hero" role="banner">
                 <div class="site-hero-bg" aria-hidden="true"></div>
                 <div class="site-hero-content">
