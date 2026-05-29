@@ -53,6 +53,9 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                 <div class="site-hero-content">
                     <div class="hero-card">
                         <h1 class="site-title">"Book Reviews"</h1>
+                        <p class="hero-about">
+                            "Books are a form of time travel. Open one and you\u{2019}re inside a mind from two hundred years ago, or a thousand. Writing about what I read is another layer of that. These reviews are what I send forward. Layered time travel."
+                        </p>
                         <dl class="era-list">
                             <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
                             <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>

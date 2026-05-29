@@ -135,6 +135,18 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
   letter-spacing: -0.02em;
 }
 
+/* About paragraph inside the hero card. Serif prose so it reads as a
+   statement, not a UI label. Capped at a single readable measure even
+   though the hero card is wider. */
+.hero-about {
+  margin: 0 0 var(--space-3);
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #ece8db;
+  max-width: 34rem;
+}
+
 .hero-updated {
   margin: var(--space-3) 0 0;
   padding-top: var(--space-2);
@@ -240,6 +252,7 @@ body[itemtype$="Blog"] .container {
   .site-hero-content .site-title { font-size: 2.25rem; }
   .era-list { font-size: 0.875rem; gap: 0.3rem 0.8rem; }
   .hero-card { padding: var(--space-2) var(--space-3); border-radius: 12px; }
+  .hero-about { font-size: 0.98rem; line-height: 1.55; }
   /* On mobile: positive separation between the hero-card and the spine, and
      a screen-edge inset that matches the hero-card's so both panels share the
      same horizontal frame. Overrides the desktop negative pull. */
