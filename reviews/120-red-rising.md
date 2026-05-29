@@ -4,3 +4,5 @@ title = "Red Rising"
 author = "Pierce Brown"
 date = "2025-09-28"
 +++
+
+_Review pending._
