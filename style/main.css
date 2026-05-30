@@ -167,6 +167,16 @@ a:hover { color: var(--link-hover); text-decoration-color: var(--accent); }
   color: var(--accent);
 }
 .hero-updated-date { color: #fff; font-weight: 500; }
+.hero-updated-version {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #cfcabb;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0.08rem 0.5rem;
+}
 
 /* ---- Index-only: image extends behind the entire page, with the main
    column sitting on a darker frosted-glass card. The image is atmospheric,
@@ -229,6 +239,14 @@ body[itemtype$="Blog"] .container {
   font-family: var(--sans);
   font-size: 0.95rem;
 }
+/* Each row spans both columns via subgrid so the whole row — years, gap and
+   description — is a single hover/focus target rather than two separate links. */
+.era-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+}
 .era-list dt {
   font-family: var(--mono);
   color: var(--accent);
@@ -253,13 +271,11 @@ body[itemtype$="Blog"] .container {
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s ease, opacity 0.15s ease;
 }
-.era-link:hover,
-.era-link:focus-visible {
+/* Hovering anywhere on the row — or focusing either link in it — underlines
+   both the years and the description together. */
+.era-row:hover .era-link,
+.era-row:focus-within .era-link {
   border-bottom-color: currentColor;
-}
-.era-list dd .era-link:hover,
-.era-list dd .era-link:focus-visible {
-  opacity: 1;
 }
 
 @media (max-width: 520px) {
@@ -290,10 +306,6 @@ body[itemtype$="Blog"] .container {
 .site-subtitle { color: var(--fg-muted); font-style: italic; margin: 0 0 var(--space-3); }
 .site-nav { font-family: var(--sans); font-size: 0.9rem; display: flex; gap: var(--space-3); align-items: center; }
 .site-nav.top-nav { margin-bottom: var(--space-4); }
-/* Inline "jump to bottom" alongside the everythingsings / RSS links. */
-.nav-to-bottom { display: inline-flex; align-items: center; gap: 0.3rem; }
-.nav-to-bottom-icon { display: inline-flex; line-height: 0; }
-.nav-to-bottom-icon svg { width: 0.95em; height: 0.95em; display: block; }
 
 .kindle-callout {
   margin-top: var(--space-3);

@@ -134,12 +134,14 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
             if era_present[e] {
                 let target = format!("#era-{e}");
                 view! {
-                    <dt><a class="era-link" href=target.clone()>{years}</a></dt>
-                    <dd><a class="era-link" href=target>{desc}</a></dd>
+                    <div class="era-row">
+                        <dt><a class="era-link" href=target.clone()>{years}</a></dt>
+                        <dd><a class="era-link" href=target>{desc}</a></dd>
+                    </div>
                 }
                 .into_any()
             } else {
-                view! { <dt>{years}</dt><dd>{desc}</dd> }.into_any()
+                view! { <div class="era-row"><dt>{years}</dt><dd>{desc}</dd></div> }.into_any()
             }
         })
         .collect();
@@ -171,6 +173,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         <p class="hero-updated">
                             <span class="hero-updated-label">"Last updated"</span>
                             <span class="hero-updated-date">{last_updated}</span>
+                            <span class="hero-updated-version">{format!("v{}", env!("CARGO_PKG_VERSION"))}</span>
                         </p>
                     </div>
                 </div>
@@ -180,10 +183,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                     <nav class="site-nav">
                         <a href="https://everythingsings.art" rel="me">"\u{2190} everythingsings.art"</a>
                         <a href="/feed.xml">"RSS"</a>
-                        <a class="nav-to-bottom" href="#bottom">
-                            <span class="nav-to-bottom-icon" aria-hidden="true" inner_html=ICON_DOWN></span>
-                            "bottom"
-                        </a>
+                        <a href="#bottom">"bottom \u{2193}"</a>
                     </nav>
                 </header>
                 <details class="status-legend">
