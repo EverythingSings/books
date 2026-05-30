@@ -287,8 +287,12 @@ body[itemtype$="Blog"] .container {
 }
 .site-title { font-size: 2.5rem; margin: 0 0 var(--space-2); font-weight: 700; letter-spacing: -0.02em; }
 .site-subtitle { color: var(--fg-muted); font-style: italic; margin: 0 0 var(--space-3); }
-.site-nav { font-family: var(--sans); font-size: 0.9rem; display: flex; gap: var(--space-3); }
+.site-nav { font-family: var(--sans); font-size: 0.9rem; display: flex; gap: var(--space-3); align-items: center; }
 .site-nav.top-nav { margin-bottom: var(--space-4); }
+/* Inline "jump to bottom" alongside the everythingsings / RSS links. */
+.nav-to-bottom { display: inline-flex; align-items: center; gap: 0.3rem; }
+.nav-to-bottom-icon { display: inline-flex; line-height: 0; }
+.nav-to-bottom-icon svg { width: 0.95em; height: 0.95em; display: block; }
 
 .kindle-callout {
   margin-top: var(--space-3);
@@ -319,6 +323,71 @@ body[itemtype$="Blog"] .container {
 }
 .kc-cta:hover { color: var(--link-hover); }
 
+/* ------- Collapsible status legend (between the intro and the spine) ------- */
+.status-legend {
+  margin: 0 0 var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-family: var(--sans);
+}
+.status-legend-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  transition: color 0.15s ease;
+}
+.status-legend-summary::-webkit-details-marker { display: none; }
+/* Chevron that rotates open/closed. */
+.status-legend-summary::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  flex: none;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: translateY(-0.1em) rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+.status-legend[open] .status-legend-summary::before {
+  transform: translateY(0.05em) rotate(45deg);
+}
+.status-legend-summary:hover { color: var(--fg); }
+.status-legend-body {
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+.status-legend-body p { margin: 0 0 var(--space-2); }
+.status-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.status-legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.status-legend-list .entry-status {
+  margin-left: 0;
+  flex: none;
+  vertical-align: 0;
+}
+.status-legend-list .entry-status svg { width: 1.05em; height: 1.05em; }
+.status-legend-list strong { color: var(--fg); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+  .status-legend-summary::before { transition: none; }
+}
+
 .entries {
   list-style: none;
   padding: 0;
@@ -341,8 +410,25 @@ body[itemtype$="Blog"] .container {
   color: var(--fg);
   align-items: baseline;
 }
-.entry-link:hover { background: var(--bg-soft); }
-.entry-link:hover .entry-title { color: var(--accent); }
+/* Hovering anywhere on the row gives one full-width underline, so the whole
+   entry reads as a single link rather than the title being its own target. */
+.entry-link:hover,
+.entry-link:focus-visible {
+  background: var(--bg-soft);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+/* Status marks (pending / retroactive) sit on the title line. */
+.entry-status {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -0.12em;
+  margin-left: 0.45rem;
+  line-height: 0;
+}
+.entry-status svg { width: 0.85em; height: 0.85em; display: block; }
+.entry-status.pending { color: var(--fg-faint); }
+.entry-status.retroactive { color: var(--accent); }
 
 .entry-num {
   grid-area: num;
@@ -539,4 +625,77 @@ body[itemtype$="Blog"] .container {
 
 @keyframes scroll-progress {
   to { transform: scaleX(1); }
+}
+
+/* ------- Floating top/bottom navigator -------
+   A small fixed control that appears once the hero has scrolled out of view,
+   driven by a view-timeline on the hero (no JS). Browsers without scroll-driven
+   animation simply show it at all times — a harmless nav aid (graceful
+   degradation, same approach as the progress bar above). */
+body[itemtype$="Blog"] { timeline-scope: --hero-view; }
+.site-hero { view-timeline-name: --hero-view; view-timeline-axis: block; }
+
+.floating-nav {
+  position: fixed;
+  right: clamp(0.75rem, 3vw, 1.5rem);
+  bottom: clamp(0.75rem, 3vw, 1.5rem);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-family: var(--sans);
+}
+.floating-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(15, 15, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #f0ecdf;
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+.floating-nav-btn:hover,
+.floating-nav-btn:focus-visible {
+  border-color: var(--accent);
+  color: #fff;
+}
+.floating-nav-icon { display: inline-flex; line-height: 0; }
+.floating-nav-icon svg { width: 1em; height: 1em; display: block; }
+
+@supports (animation-timeline: view()) {
+  .floating-nav {
+    animation: floating-nav-reveal linear both;
+    animation-timeline: --hero-view;
+    animation-range: exit 0% exit 100%;
+  }
+}
+@keyframes floating-nav-reveal {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); pointer-events: none; }
+  to   { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes floating-nav-reveal {
+    from { opacity: 0; pointer-events: none; }
+    to   { opacity: 1; pointer-events: auto; }
+  }
+}
+/* Icon-only on narrow screens to stay out of the reading column's way. */
+@media (max-width: 520px) {
+  .floating-nav-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .floating-nav-btn { padding: 0.55rem; }
 }

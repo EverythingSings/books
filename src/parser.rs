@@ -17,6 +17,10 @@ struct Frontmatter {
     pub _date_raw: String,
     #[serde(default)]
     pub link: String,
+    /// Set `retroactive = true` when the review was written some time after the
+    /// book was read (e.g. backfilled long afterwards). Surfaces a small badge.
+    #[serde(default)]
+    pub retroactive: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -30,6 +34,10 @@ pub struct Review {
     pub slug: String,
     pub body_html: String,
     pub body_text: String, // plaintext for description/feed
+    /// No review written yet — the body is the `_Review pending._` stub.
+    pub pending: bool,
+    /// Review written well after the book was read (from frontmatter flag).
+    pub retroactive: bool,
 }
 
 pub fn load_all(dir: &Path) -> std::io::Result<Vec<Review>> {
@@ -72,6 +80,7 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
     let body_html = render_markdown(body);
     let body_text = strip_markdown(body);
     let date_display = format_date(&fm.date);
+    let pending = is_pending(&body_text);
 
     Some(Review {
         number: fm.number,
@@ -83,6 +92,9 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
         slug,
         body_html,
         body_text,
+        pending,
+        // A pending stub has no review yet, so it can't be "retroactive".
+        retroactive: !pending && fm.retroactive,
     })
 }
 
@@ -195,6 +207,20 @@ fn format_date(iso: &str) -> String {
     }
 }
 
+/// A review is "pending" when its body is just the placeholder stub — no prose
+/// written yet. Compared against the markdown-stripped plaintext so
+/// `_Review pending._` and plain `Review pending.` both match, case-insensitively.
+/// A leading star rating (e.g. `★★★★`) is allowed: a rated-but-unwritten entry
+/// is still pending.
+fn is_pending(body_text: &str) -> bool {
+    body_text
+        .trim()
+        .trim_start_matches(|c: char| matches!(c, '★' | '☆') || c.is_whitespace())
+        .trim_end_matches('.')
+        .trim()
+        .eq_ignore_ascii_case("review pending")
+}
+
 fn slugify(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut last_dash = true;
@@ -243,5 +269,34 @@ mod tests {
     fn format_date_full() {
         assert_eq!(format_date("2019-01-09"), "January 9, 2019");
         assert_eq!(format_date("2020-06-01"), "June 1, 2020");
+    }
+
+    #[test]
+    fn pending_detection() {
+        assert!(is_pending("Review pending."));
+        assert!(is_pending("  review pending  "));
+        // A star rating with no written review is still pending.
+        assert!(is_pending("★★★★ Review pending."));
+        assert!(is_pending("★★★★★ review pending"));
+        assert!(!is_pending("This book was a delight to read."));
+        assert!(!is_pending("★★★★ A genuinely written review follows here."));
+        assert!(!is_pending("Review pending, more soon — but here's a thought."));
+    }
+
+    #[test]
+    fn pending_stub_parses_as_pending_not_retroactive() {
+        let text = "+++\nnumber = 110\ntitle = \"Build\"\ndate = \"2024-11-01\"\nretroactive = true\n+++\n\n_Review pending._\n";
+        let r = parse_one(Path::new("reviews/110-build.md"), text).unwrap();
+        assert!(r.pending);
+        // A pending stub is never also retroactive, even if the flag is set.
+        assert!(!r.retroactive);
+    }
+
+    #[test]
+    fn retroactive_flag_on_real_review() {
+        let text = "+++\nnumber = 5\ntitle = \"X\"\ndate = \"2026-01-01\"\nretroactive = true\n+++\n\nA real review written long after reading.\n";
+        let r = parse_one(Path::new("reviews/005-x.md"), text).unwrap();
+        assert!(!r.pending);
+        assert!(r.retroactive);
     }
 }
