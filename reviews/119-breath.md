@@ -5,6 +5,4 @@ author = "James Nestor"
 date = "2025-09-27"
 +++
 
-★★★★★
-
 _Review pending._

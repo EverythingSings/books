@@ -210,12 +210,9 @@ fn format_date(iso: &str) -> String {
 /// A review is "pending" when its body is just the placeholder stub — no prose
 /// written yet. Compared against the markdown-stripped plaintext so
 /// `_Review pending._` and plain `Review pending.` both match, case-insensitively.
-/// A leading star rating (e.g. `★★★★`) is allowed: a rated-but-unwritten entry
-/// is still pending.
 fn is_pending(body_text: &str) -> bool {
     body_text
         .trim()
-        .trim_start_matches(|c: char| matches!(c, '★' | '☆') || c.is_whitespace())
         .trim_end_matches('.')
         .trim()
         .eq_ignore_ascii_case("review pending")
@@ -275,11 +272,7 @@ mod tests {
     fn pending_detection() {
         assert!(is_pending("Review pending."));
         assert!(is_pending("  review pending  "));
-        // A star rating with no written review is still pending.
-        assert!(is_pending("★★★★ Review pending."));
-        assert!(is_pending("★★★★★ review pending"));
         assert!(!is_pending("This book was a delight to read."));
-        assert!(!is_pending("★★★★ A genuinely written review follows here."));
         assert!(!is_pending("Review pending, more soon — but here's a thought."));
     }
 

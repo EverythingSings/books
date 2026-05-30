@@ -122,6 +122,11 @@ fn parse_entry(entry: &str) -> Entry {
 
     for line in lines {
         let trimmed = line.trim();
+        // Star ratings aren't used on this site — drop any star-only line,
+        // wherever it appears, so they never reach a review body.
+        if !trimmed.is_empty() && trimmed.chars().all(|c| "★☆".contains(c)) {
+            continue;
+        }
         if !header_done {
             if trimmed.is_empty() {
                 continue;
@@ -144,10 +149,6 @@ fn parse_entry(entry: &str) -> Entry {
                 }
                 continue;
             }
-            // Star-rating line at the top — preserve as rating, don't push to body.
-            if trimmed.chars().all(|c| "★☆".contains(c)) && !trimmed.is_empty() {
-                continue;
-            }
             // Date?
             if date_raw.is_empty() {
                 if let Some(iso) = parse_date(trimmed) {
@@ -163,7 +164,6 @@ fn parse_entry(entry: &str) -> Entry {
                     continue;
                 }
             }
-            // Star-rating line — preserve in body so context isn't lost.
             // Anything else: header is done, treat from here as body.
             header_done = true;
         }
@@ -523,5 +523,16 @@ mod tests {
     fn clean_wikilink() {
         assert_eq!(clean_text("[[Atomic Habits]]"), "Atomic Habits");
         assert_eq!(clean_text("[[note|Display]]"), "Display");
+    }
+
+    #[test]
+    fn star_rating_line_is_dropped() {
+        // Star ratings are not used on this site: a leading rating line must
+        // not survive into the review body, leaving just the prose.
+        let entry = "# 122: Neuromancer - William Gibson\n2025-11-04\n★★★★\n_Review pending._";
+        let e = parse_entry(entry);
+        assert_eq!(e.title, "Neuromancer");
+        assert!(!e.body.contains('★'));
+        assert_eq!(e.body, "_Review pending._");
     }
 }
