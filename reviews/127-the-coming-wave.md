@@ -1,5 +1,5 @@
 +++
-number = 126
+number = 127
 title = "The Coming Wave"
 author = "Mustafa Suleyman"
 date = "2026-04-03"

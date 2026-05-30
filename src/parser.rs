@@ -21,6 +21,11 @@ struct Frontmatter {
     /// book was read (e.g. backfilled long afterwards). Surfaces a small badge.
     #[serde(default)]
     pub retroactive: bool,
+    /// Date the review was actually written, when that differs from `date` (the
+    /// date the book was finished). Only meaningful for retroactive reviews;
+    /// surfaces a "Reviewed …" timestamp beside the "Finished …" date.
+    #[serde(default)]
+    pub reviewed: String,
 }
 
 #[derive(Debug, Clone)]
@@ -28,12 +33,15 @@ pub struct Review {
     pub number: u32,
     pub title: String,
     pub author: String,
-    pub date: String,        // YYYY-MM-DD
+    pub date: String,        // YYYY-MM-DD — date the book was finished
     pub date_display: String, // human-friendly, e.g. "January 9, 2019"
+    pub reviewed: String,         // YYYY-MM-DD the review was written; empty if same as `date`
+    pub reviewed_display: String, // human-friendly form of `reviewed`; empty if none
     pub link: String,
     pub slug: String,
     pub body_html: String,
     pub body_text: String, // plaintext for description/feed
+    pub body_md: String,   // raw markdown body, as written (for llms-full.txt / agents)
     /// No review written yet — the body is the `_Review pending._` stub.
     pub pending: bool,
     /// Review written well after the book was read (from frontmatter flag).
@@ -81,6 +89,17 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
     let body_text = strip_markdown(body);
     let date_display = format_date(&fm.date);
     let pending = is_pending(&body_text);
+    // A "reviewed" date only makes sense on a real, retroactive review.
+    let reviewed = if pending || !fm.retroactive {
+        String::new()
+    } else {
+        fm.reviewed
+    };
+    let reviewed_display = if reviewed.is_empty() {
+        String::new()
+    } else {
+        format_date(&reviewed)
+    };
 
     Some(Review {
         number: fm.number,
@@ -88,10 +107,13 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
         author: fm.author,
         date: fm.date,
         date_display,
+        reviewed,
+        reviewed_display,
         link: fm.link,
         slug,
         body_html,
         body_text,
+        body_md: body.trim().to_string(),
         pending,
         // A pending stub has no review yet, so it can't be "retroactive".
         retroactive: !pending && fm.retroactive,

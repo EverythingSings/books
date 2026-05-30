@@ -39,6 +39,8 @@ pub fn generate_head_html(meta: &PageMeta) -> String {
 <meta name="twitter:description" content="{description}" />
 <meta name="twitter:image" content="{og_image}" />
 <link rel="alternate" type="application/rss+xml" title="{site_name} RSS Feed" href="/feed.xml" />
+<link rel="alternate" type="text/plain" title="{site_name} for LLMs (index)" href="/llms.txt" />
+<link rel="alternate" type="text/markdown" title="{site_name} for LLMs (full text)" href="/llms-full.txt" />
 <link rel="stylesheet" href="/main.css" />
 <script type="application/ld+json">{json_ld}</script>
 </head>"#,

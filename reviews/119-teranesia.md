@@ -1,5 +1,5 @@
 +++
-number = 118
+number = 119
 title = "Teranesia"
 author = "Greg Egan"
 date = "2025-09-18"

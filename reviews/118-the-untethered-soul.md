@@ -1,5 +1,5 @@
 +++
-number = 117
+number = 118
 title = "The Untethered Soul"
 author = "Michael A. Singer"
 date = "2025-09-04"

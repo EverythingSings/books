@@ -521,6 +521,11 @@ body[itemtype$="Blog"] .container {
   font-family: var(--sans);
   font-size: 0.85rem;
 }
+.footer-formats {
+  margin-top: var(--space-1);
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
 
 /* ------- Review page ------- */
 

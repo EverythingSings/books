@@ -108,8 +108,9 @@ fn generate() -> std::io::Result<()> {
     // feed.xml
     fs::write(out.join("feed.xml"), generate_feed(&reviews))?;
 
-    // llms.txt
+    // llms.txt (index, links only) + llms-full.txt (every written review inline)
     fs::write(out.join("llms.txt"), generate_llms_txt(&reviews))?;
+    fs::write(out.join("llms-full.txt"), generate_llms_full_txt(&reviews))?;
 
     println!("\ndone -> {}", out.display());
     Ok(())
@@ -156,10 +157,17 @@ fn render_review_page(
     } else {
         excerpt.clone()
     };
+    // `datePublished` is when the review went live: the reviewed date for a
+    // retroactive entry, otherwise the (single) date.
+    let published = if review.reviewed.is_empty() {
+        &review.date
+    } else {
+        &review.reviewed
+    };
     let json_ld = review_json_ld(
         &review.title,
         &review.author,
-        &review.date,
+        published,
         &excerpt,
         &canonical,
     );
@@ -224,9 +232,40 @@ fn generate_feed(reviews: &[Review]) -> String {
 
 fn generate_llms_txt(reviews: &[Review]) -> String {
     let mut out = format!(
-        "# {SITE_NAME}\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Type: personal reading journal\n- Format: static HTML, no JavaScript required\n- Feed: {SITE_URL}/feed.xml\n\n## All Reviews (oldest first)\n\n"
+        "# {SITE_NAME}\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Type: personal reading journal\n- Format: static HTML, no JavaScript required\n- Full text of every review in one file: {SITE_URL}/llms-full.txt\n- Feed: {SITE_URL}/feed.xml\n\n## All Reviews (oldest first)\n\n"
     );
     out.push_str(&render_index_text(reviews));
+    out
+}
+
+/// Every written review, full text inline — a single file an agent can fetch to
+/// read the whole corpus without crawling each page. Pending entries are skipped
+/// (no review yet); they still appear in the `llms.txt` index.
+fn generate_llms_full_txt(reviews: &[Review]) -> String {
+    let total = reviews.len();
+    let written = reviews.iter().filter(|r| !r.pending).count();
+    let mut out = format!(
+        "# {SITE_NAME} — Full Text\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Reviews with full text below: {written} of {total} (oldest first)\n- Index of all reviews (links only): {SITE_URL}/llms.txt\n- Feed: {SITE_URL}/feed.xml\n\n---\n\n"
+    );
+    for r in reviews {
+        if r.pending {
+            continue;
+        }
+        out.push_str(&format!("## #{:03} {}\n", r.number, r.title));
+        if !r.author.is_empty() {
+            out.push_str(&format!("- Author: {}\n", r.author));
+        }
+        out.push_str(&format!("- Finished: {}\n", r.date));
+        if !r.reviewed.is_empty() {
+            out.push_str(&format!("- Reviewed: {}\n", r.reviewed));
+        }
+        if !r.link.is_empty() {
+            out.push_str(&format!("- Source: {}\n", r.link));
+        }
+        out.push_str(&format!("- URL: {SITE_URL}/reviews/{}/\n\n", r.slug));
+        out.push_str(r.body_md.trim());
+        out.push_str("\n\n---\n\n");
+    }
     out
 }
 

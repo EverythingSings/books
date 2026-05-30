@@ -14,3 +14,7 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://books.everythingsings.art/sitemap.xml
+
+# For LLMs and agents — the whole corpus without crawling each page:
+#   https://books.everythingsings.art/llms-full.txt   (every review, full text)
+#   https://books.everythingsings.art/llms.txt         (index of all reviews)

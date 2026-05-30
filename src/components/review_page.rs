@@ -15,6 +15,11 @@ pub fn ReviewPage(
     let author = review.author.clone();
     let date_display = review.date_display.clone();
     let date_iso = review.date.clone();
+    let reviewed_display = review.reviewed_display.clone();
+    let reviewed_iso = review.reviewed.clone();
+    // A retroactive review with a known writing date shows both: when the book
+    // was finished and, separately, when the review was actually written.
+    let show_reviewed = review.retroactive && !reviewed_display.is_empty();
     let n = review.number;
     let link = review.link.clone();
     let cover = cover_path;
@@ -24,6 +29,23 @@ pub fn ReviewPage(
         "review-layout review-layout--with-cover"
     } else {
         "review-layout"
+    };
+
+    // `datePublished` is the date the review text went live: the reviewed date
+    // for a retroactive entry, otherwise the (single) date.
+    let date_meta = if show_reviewed {
+        view! {
+            "Finished "
+            <time datetime=date_iso>{date_display}</time>
+            " · Reviewed "
+            <time itemprop="datePublished" datetime=reviewed_iso>{reviewed_display}</time>
+        }
+        .into_any()
+    } else {
+        view! {
+            <time itemprop="datePublished" datetime=date_iso>{date_display}</time>
+        }
+        .into_any()
     };
 
     view! {
@@ -67,7 +89,7 @@ pub fn ReviewPage(
                                     </p>
                                 })}
                                 <p class="review-meta">
-                                    <time itemprop="datePublished" datetime=date_iso>{date_display}</time>
+                                    {date_meta}
                                     {(!link.is_empty()).then(|| view! {
                                         " · "
                                         <a class="external" href=link.clone() rel="noopener external">"\u{2197} source"</a>

@@ -1,5 +1,5 @@
 +++
-number = 120
+number = 121
 title = "Red Rising"
 author = "Pierce Brown"
 date = "2025-09-28"

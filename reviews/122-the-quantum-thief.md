@@ -1,5 +1,5 @@
 +++
-number = 121
+number = 122
 title = "The Quantum Thief"
 author = "Hannu Rajaniemi"
 date = "2025-10-10"

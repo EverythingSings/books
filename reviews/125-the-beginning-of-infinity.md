@@ -1,5 +1,5 @@
 +++
-number = 124
+number = 125
 title = "The Beginning of Infinity"
 author = "David Deutsch"
 date = "2026-03-24"

@@ -100,9 +100,14 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         inner_html=ICON_PENDING></span>
                 }.into_any())
             } else if r.retroactive {
+                let label = if r.reviewed_display.is_empty() {
+                    "Retroactive review".to_string()
+                } else {
+                    format!("Finished {}, reviewed {}", r.date_display, r.reviewed_display)
+                };
                 Some(view! {
                     <span class="entry-status retroactive" role="img"
-                        aria-label="Retroactive review" title="Retroactive review"
+                        aria-label=label.clone() title=label
                         inner_html=ICON_RETRO></span>
                 }.into_any())
             } else {
@@ -212,6 +217,16 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         {format!("{total} reviews · oldest first · ")}
                         <a href="#top">"top \u{2191}"</a>
                     </p>
+                    <p class="footer-formats">
+                        "Machine-readable: "
+                        <a href="/llms-full.txt">"llms-full.txt"</a>
+                        " (every review, full text) · "
+                        <a href="/llms.txt">"llms.txt"</a>
+                        " · "
+                        <a href="/feed.xml">"RSS"</a>
+                        " · "
+                        <a href="/sitemap.xml">"sitemap"</a>
+                    </p>
                 </footer>
             </main>
         </body>
@@ -220,8 +235,8 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
 
 /// Renders the index page as plain text (for llms.txt and similar).
 pub fn render_index_text(reviews: &[Review]) -> String {
+    // No top-level header here: the only caller (llms.txt) prints its own.
     let mut out = String::new();
-    out.push_str("# Book Reviews\n\n");
     for r in reviews {
         if r.author.is_empty() {
             out.push_str(&format!("- #{:03} {} ({})\n", r.number, r.title, r.date));
