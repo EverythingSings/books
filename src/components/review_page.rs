@@ -18,6 +18,13 @@ pub fn ReviewPage(
     let n = review.number;
     let link = review.link.clone();
     let cover = cover_path;
+    // Two-column (cover beside text) only when a cover exists; otherwise the
+    // text column stands alone at normal reading width.
+    let layout_class = if cover.is_some() {
+        "review-layout review-layout--with-cover"
+    } else {
+        "review-layout"
+    };
 
     view! {
         <body itemscope itemtype="https://schema.org/Review">
@@ -26,31 +33,50 @@ pub fn ReviewPage(
                     <a href="/">"\u{2190} all reviews"</a>
                 </nav>
                 <article class="review">
-                    <header class="review-header">
-                        <p class="review-number">{format!("#{n:03}")}</p>
-                        <h1 class="review-title" itemprop="itemReviewed" itemscope itemtype="https://schema.org/Book">
-                            <span itemprop="name">{title.clone()}</span>
-                        </h1>
-                        {(!author.is_empty()).then(|| view! {
-                            <p class="review-author">
-                                "by "
-                                <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                    <span itemprop="name">{author.clone()}</span>
-                                </span>
-                            </p>
-                        })}
-                        <p class="review-meta">
-                            <time itemprop="datePublished" datetime=date_iso>{date_display}</time>
-                            {(!link.is_empty()).then(|| view! {
-                                " · "
-                                <a class="external" href=link.clone() rel="noopener external">"\u{2197} source"</a>
-                            })}
-                        </p>
+                    <div class=layout_class>
                         {cover.as_ref().map(|c| view! {
-                            <img class="review-cover" src=c.clone() alt={format!("Cover of {}", title)} loading="lazy" />
+                            <figure class="review-cover-wrap">
+                                // width/height encode the 2:3 ratio for engines
+                                // without aspect-ratio; the CSS aspect-ratio +
+                                // object-fit reserves the box before load so
+                                // the body never shifts. Cover is above the
+                                // fold here, so load it eagerly (it's the LCP).
+                                <img
+                                    class="review-cover"
+                                    src=c.clone()
+                                    alt={format!("Cover of {title}")}
+                                    width="400"
+                                    height="600"
+                                    loading="eager"
+                                    decoding="async"
+                                />
+                            </figure>
                         })}
-                    </header>
-                    <div class="review-body" itemprop="reviewBody" inner_html=body_html></div>
+                        <div class="review-main">
+                            <header class="review-header">
+                                <p class="review-number">{format!("#{n:03}")}</p>
+                                <h1 class="review-title" itemprop="itemReviewed" itemscope itemtype="https://schema.org/Book">
+                                    <span itemprop="name">{title.clone()}</span>
+                                </h1>
+                                {(!author.is_empty()).then(|| view! {
+                                    <p class="review-author">
+                                        "by "
+                                        <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                            <span itemprop="name">{author.clone()}</span>
+                                        </span>
+                                    </p>
+                                })}
+                                <p class="review-meta">
+                                    <time itemprop="datePublished" datetime=date_iso>{date_display}</time>
+                                    {(!link.is_empty()).then(|| view! {
+                                        " · "
+                                        <a class="external" href=link.clone() rel="noopener external">"\u{2197} source"</a>
+                                    })}
+                                </p>
+                            </header>
+                            <div class="review-body" itemprop="reviewBody" inner_html=body_html></div>
+                        </div>
+                    </div>
                 </article>
                 <nav class="review-nav">
                     {prev.map(|(slug, t)| view! {

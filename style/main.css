@@ -18,6 +18,7 @@
 
   --measure: 38rem; /* ~65 chars of body copy */
   --measure-wide: 56rem;
+  --cover-w: 200px; /* fixed cover column on the review page */
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.5rem;
@@ -512,9 +513,31 @@ body[itemtype$="Blog"] .container {
 /* ------- Review page ------- */
 
 .review {
-  max-width: var(--measure);
   margin: 0 auto;
 }
+
+/* Cover-beside-text layout. CSS grid: a fixed cover rail + a fluid text
+   column. The text column is capped at --measure so prose stays readable
+   even on a wide screen. */
+.review-layout {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0 auto;
+  max-width: var(--measure);
+}
+.review-layout--with-cover {
+  max-width: var(--measure-wide);
+  grid-template-columns: var(--cover-w) minmax(0, 1fr);
+  align-items: start;
+}
+.review-main { max-width: var(--measure); }
+
+.review-cover-wrap {
+  margin: 0;
+  position: sticky; /* cover trails alongside the text on long reviews */
+  top: var(--space-3);
+}
+
 .review-header { margin-bottom: var(--space-4); }
 .review-number {
   font-family: var(--mono);
@@ -547,12 +570,12 @@ body[itemtype$="Blog"] .container {
 
 .review-cover {
   display: block;
-  max-width: 240px;
-  width: 100%;
+  width: 100%;            /* fill the fixed cover column */
+  aspect-ratio: 2 / 3;    /* THE reservation — height is known before load */
   height: auto;
+  object-fit: cover;      /* crop, never distort, off-ratio covers */
   border-radius: 4px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  margin: var(--space-3) 0;
 }
 
 .review-body {
@@ -596,6 +619,20 @@ body[itemtype$="Blog"] .container {
 .review-nav .next { text-align: right; }
 .review-nav .dir { font-size: 0.8rem; color: var(--fg-faint); }
 .review-nav .t { font-weight: 600; font-size: 0.95rem; }
+
+/* Stack cover above text on phones — but keep the aspect-ratio reservation,
+   so there's still no layout shift. */
+@media (max-width: 600px) {
+  .review-layout--with-cover {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .review-cover-wrap {
+    position: static;        /* no sticky on mobile */
+    width: var(--cover-w);   /* don't let the cover go full-bleed */
+    max-width: 50vw;
+  }
+}
 
 @media (max-width: 520px) {
   .review-title { font-size: 1.8rem; }
