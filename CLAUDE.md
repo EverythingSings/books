@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code when working in the `books/` project.
 
+## Canonical location (WSL)
+
+This repo lives in the WSL filesystem and is the **only** working copy:
+
+```
+/home/trist/engineering/books   # remote git@github.com:EverythingSings/books.git, branch main
+```
+
+A stale duplicate used to exist on the Windows mount
+(`/mnt/c/Users/Trist/engineering/books`); it has been deleted. Always work here
+under WSL. Deploy = `cargo test && cargo build --release && git push origin main`
+(GitHub Actions publishes to GitHub Pages on push to `main`; there is no `gh`
+CLI on this machine).
+
 ## Project Overview
 
 `books.everythingsings.art` — a personal book-reviews site. Pure SSR with Leptos
