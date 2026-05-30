@@ -245,6 +245,21 @@ body[itemtype$="Blog"] .container {
   font-style: italic;
   opacity: 0.85;
 }
+/* Era rows link to their section; keep the dt/dd colors, just add affordance. */
+.era-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+}
+.era-link:hover,
+.era-link:focus-visible {
+  border-bottom-color: currentColor;
+}
+.era-list dd .era-link:hover,
+.era-list dd .era-link:focus-visible {
+  opacity: 1;
+}
 
 @media (max-width: 520px) {
   .site-hero { min-height: 56vh; }
@@ -311,6 +326,8 @@ body[itemtype$="Blog"] .container {
   border-top: 1px solid var(--rule);
 }
 .entry { border-bottom: 1px solid var(--rule); }
+/* Era-anchored entries: offset jump target so the row isn't flush to the top. */
+.entry[id] { scroll-margin-top: 1.5rem; }
 .entry-link {
   display: grid;
   grid-template-columns: 4ch 1fr auto;

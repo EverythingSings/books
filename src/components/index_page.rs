@@ -17,21 +17,62 @@ fn truncate_excerpt(text: &str, chars: usize) -> String {
     }
 }
 
+/// Reading eras, each anchored to the first review whose year falls within it.
+/// `start_year` partitions the timeline: a review belongs to the latest era
+/// whose `start_year` is <= the review's year.
+struct Era {
+    start_year: u32,
+    years: &'static str,
+    desc: &'static str,
+}
+
+const ERAS: &[Era] = &[
+    Era { start_year: 2019, years: "2019–2020", desc: "philosophy & self-discovery" },
+    Era { start_year: 2020, years: "2020–2022", desc: "deep sci-fi immersion" },
+    Era { start_year: 2023, years: "2023–2024", desc: "AI, design & creativity" },
+    Era { start_year: 2024, years: "2024–2025", desc: "the inward turn" },
+];
+
+/// Year (first four chars of the ISO date) → index into `ERAS`.
+fn era_index(date: &str) -> usize {
+    let year: u32 = date.get(..4).and_then(|y| y.parse().ok()).unwrap_or(0);
+    ERAS.iter()
+        .rposition(|e| e.start_year <= year)
+        .unwrap_or(0)
+}
+
 #[component]
 pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
     let total = reviews.len();
     let last_updated = today_display();
+
+    // The first review in each era gets an `id="era-N"` anchor so the header
+    // links can jump straight to that section. `anchored[i]` is the era index
+    // to stamp on entry `i`, if it's the first entry of its era.
+    let mut anchored: Vec<Option<usize>> = vec![None; reviews.len()];
+    let mut seen = [false; 8];
+    for (i, r) in reviews.iter().enumerate() {
+        let e = era_index(&r.date);
+        if !seen[e] {
+            seen[e] = true;
+            anchored[i] = Some(e);
+        }
+    }
+    let era_present = seen;
+
     let entries: Vec<_> = reviews
         .iter()
-        .map(|r| {
+        .enumerate()
+        .map(|(i, r)| {
             let href = format!("/reviews/{}/", r.slug);
             let title = r.title.clone();
             let author = r.author.clone();
             let date = r.date_display.clone();
             let n = r.number;
             let preview = truncate_excerpt(&r.body_text, 220);
+            let anchor = anchored[i].map(|e| format!("era-{e}"));
             view! {
-                <li class="entry">
+                <li class="entry" id=anchor>
                     <a class="entry-link" href=href>
                         <span class="entry-num">{format!("#{n:03}")}</span>
                         <span class="entry-title">{title}</span>
@@ -42,6 +83,26 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         <span class="entry-preview">{preview}</span>
                     </a>
                 </li>
+            }
+        })
+        .collect();
+
+    let eras: Vec<_> = ERAS
+        .iter()
+        .enumerate()
+        .map(|(e, era)| {
+            let years = era.years;
+            let desc = era.desc;
+            // Only link eras that actually contain a review.
+            if era_present[e] {
+                let target = format!("#era-{e}");
+                view! {
+                    <dt><a class="era-link" href=target.clone()>{years}</a></dt>
+                    <dd><a class="era-link" href=target>{desc}</a></dd>
+                }
+                .into_any()
+            } else {
+                view! { <dt>{years}</dt><dd>{desc}</dd> }.into_any()
             }
         })
         .collect();
@@ -58,10 +119,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                             "Books are a form of time travel. Open one and you\u{2019}re inside a mind from two hundred years ago, or a thousand. Writing about what I read is another layer of that. These reviews are what I send forward. Layered time travel."
                         </p>
                         <dl class="era-list">
-                            <dt>"2019–2020"</dt><dd>"philosophy & self-discovery"</dd>
-                            <dt>"2020–2022"</dt><dd>"deep sci-fi immersion"</dd>
-                            <dt>"2023–2024"</dt><dd>"AI, design & creativity"</dd>
-                            <dt>"2024–2025"</dt><dd>"the inward turn"</dd>
+                            {eras}
                         </dl>
                         <p class="hero-updated">
                             <span class="hero-updated-label">"Last updated"</span>
