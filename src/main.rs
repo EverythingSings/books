@@ -232,7 +232,7 @@ fn generate_feed(reviews: &[Review]) -> String {
 
 fn generate_llms_txt(reviews: &[Review]) -> String {
     let mut out = format!(
-        "# {SITE_NAME}\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Type: personal reading journal\n- Format: static HTML, no JavaScript required\n- Full text of every review in one file: {SITE_URL}/llms-full.txt\n- Feed: {SITE_URL}/feed.xml\n\n## All Reviews (oldest first)\n\n"
+        "# {SITE_NAME}\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Type: personal reading journal\n- Format: static HTML, no JavaScript required\n- Note: some reviews are written by hand; others are edited with AI from a voice-to-text transcription of the author talking through the book\n- Full text of every review in one file: {SITE_URL}/llms-full.txt\n- Feed: {SITE_URL}/feed.xml\n\n## All Reviews (oldest first)\n\n"
     );
     out.push_str(&render_index_text(reviews));
     out
@@ -245,7 +245,7 @@ fn generate_llms_full_txt(reviews: &[Review]) -> String {
     let total = reviews.len();
     let written = reviews.iter().filter(|r| !r.pending).count();
     let mut out = format!(
-        "# {SITE_NAME} — Full Text\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Reviews with full text below: {written} of {total} (oldest first)\n- Index of all reviews (links only): {SITE_URL}/llms.txt\n- Feed: {SITE_URL}/feed.xml\n\n---\n\n"
+        "# {SITE_NAME} — Full Text\n\n> {SITE_DESCRIPTION}\n\n- URL: {SITE_URL}\n- Author: {SITE_AUTHOR} (https://everythingsings.art)\n- Reviews with full text below: {written} of {total} (oldest first)\n- Note: some reviews are written by hand; others are edited with AI from a voice-to-text transcription of the author talking through the book\n- Index of all reviews (links only): {SITE_URL}/llms.txt\n- Feed: {SITE_URL}/feed.xml\n\n---\n\n"
     );
     for r in reviews {
         if r.pending {

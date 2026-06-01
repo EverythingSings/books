@@ -192,7 +192,7 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                     </nav>
                 </header>
                 <details class="status-legend">
-                    <summary class="status-legend-summary">"About these reviews & their status marks"</summary>
+                    <summary class="status-legend-summary">"About these reviews, how they\u{2019}re written & their status marks"</summary>
                     <div class="status-legend-body">
                         <p>
                             "The aim is for every book here to carry a written review. That isn\u{2019}t always immediate — sometimes a book is logged first and the review follows, or is backfilled long after the reading. Two small marks show where an entry stands:"
@@ -207,6 +207,9 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                                 <span><strong>"Retroactive review"</strong>" — written some time after the book was read."</span>
                             </li>
                         </ul>
+                        <p class="status-legend-note">
+                            "How these come together varies. Some are written by hand; others are edited with AI from a voice-to-text transcription of me talking through the book."
+                        </p>
                     </div>
                 </details>
                 <ol class="entries" reversed=false>

@@ -397,6 +397,14 @@ body[itemtype$="Blog"] .container {
 }
 .status-legend-list .entry-status svg { width: 1.05em; height: 1.05em; }
 .status-legend-list strong { color: var(--fg); font-weight: 600; }
+/* Writing-process disclosure, set off as a quiet footnote below the marks. */
+.status-legend-note {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+  font-size: 0.86rem;
+  color: var(--fg-faint);
+}
 @media (prefers-reduced-motion: reduce) {
   .status-legend-summary::before { transition: none; }
 }
