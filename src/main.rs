@@ -3,12 +3,10 @@
 //! Usage:
 //!   cargo run -- --generate-static
 //!
-//! Set `BOOKS_FETCH_COVERS=1` to fetch missing covers from OpenLibrary
+//! Set `BOOKS_FETCH_COVERS=1` to fetch missing covers from Open Library
 //! during the build (uncached covers only — already-fetched files are reused).
 
-use books::components::head::{
-    generate_head_html, review_json_ld, site_index_json_ld, PageMeta,
-};
+use books::components::head::{generate_head_html, review_json_ld, site_index_json_ld, PageMeta};
 use books::components::index_page::{render_index_microdata, render_index_text};
 use books::components::{IndexPage, IndexPageProps, ReviewPage, ReviewPageProps};
 use books::config::{SITE_AUTHOR, SITE_DESCRIPTION, SITE_NAME, SITE_URL};
@@ -39,7 +37,7 @@ fn main() {
         }
         _ => {
             println!("usage: books --generate-static");
-            println!("env:   BOOKS_FETCH_COVERS=1 to fetch missing book covers from OpenLibrary");
+            println!("env:   BOOKS_FETCH_COVERS=1 to fetch missing book covers from Open Library");
         }
     }
 }
@@ -52,11 +50,24 @@ fn generate() -> std::io::Result<()> {
     // Load reviews
     let reviews_path = Path::new(REVIEWS_DIR);
     let reviews = load_all(reviews_path)?;
-    println!("loaded {} reviews from {}", reviews.len(), reviews_path.display());
+    println!(
+        "loaded {} reviews from {}",
+        reviews.len(),
+        reviews_path.display()
+    );
 
     // Cover cache (writes into public/covers/ so files are part of the source tree).
     let covers_dir = covers_dir_under(public);
     let covers = CoverCache::new(covers_dir);
+
+    // Resolve covers before copying public assets so images fetched during this
+    // build are included in the same static-site artifact.
+    let cover_paths: Vec<Option<String>> = reviews
+        .iter()
+        .map(|review| covers.cover_path(&review.slug, &review.title, &review.author))
+        .collect();
+    let covered = cover_paths.iter().filter(|path| path.is_some()).count();
+    println!("resolved {covered}/{} review covers", reviews.len());
 
     // Copy public assets
     if public.exists() {
@@ -89,8 +100,7 @@ fn generate() -> std::io::Result<()> {
 
     // Generate each review page
     for (i, review) in reviews.iter().enumerate() {
-        let cover_path = covers.cover_path(&review.slug, &review.title, &review.author);
-        let html = render_review_page(review, cover_path.as_deref(), &prev_next[i]);
+        let html = render_review_page(review, cover_paths[i].as_deref(), &prev_next[i]);
         let dir = out.join("reviews").join(&review.slug);
         fs::create_dir_all(&dir)?;
         fs::write(dir.join("index.html"), html)?;
@@ -217,7 +227,11 @@ fn generate_feed(reviews: &[Review]) -> String {
             "#{:03} {} — {}",
             r.number,
             r.title,
-            if r.author.is_empty() { "—" } else { &r.author }
+            if r.author.is_empty() {
+                "—"
+            } else {
+                &r.author
+            }
         ));
         let desc = xml_escape(&r.body_text.chars().take(500).collect::<String>());
         let pub_date = rfc822_date(&r.date);
@@ -302,9 +316,18 @@ fn rfc822_date(iso: &str) -> String {
     let month: usize = parts[1].parse().unwrap_or(1);
     let day: u32 = parts[2].parse().unwrap_or(1);
     let m_name = match month {
-        1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr",
-        5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug",
-        9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec",
+        1 => "Jan",
+        2 => "Feb",
+        3 => "Mar",
+        4 => "Apr",
+        5 => "May",
+        6 => "Jun",
+        7 => "Jul",
+        8 => "Aug",
+        9 => "Sep",
+        10 => "Oct",
+        11 => "Nov",
+        12 => "Dec",
         _ => "Jan",
     };
     format!("{day:02} {m_name} {year} 00:00:00 GMT")

@@ -97,12 +97,12 @@ NEXT=$(printf "%03d" $((10#$N + 1)))
 cp reviews/100-atomic-habits.md "reviews/${NEXT}-new-book.md"
 $EDITOR "reviews/${NEXT}-new-book.md"
 
-# preview
-cargo run --release -- --generate-static
+# fetch/cache the cover and preview
+BOOKS_FETCH_COVERS=1 cargo run --release -- --generate-static
 python3 -m http.server 8765 --directory target/site
 
 # ship
-git add reviews/ && git commit -m "add review ${NEXT}: <title>" && git push
+git add reviews/ public/covers/ && git commit -m "add review ${NEXT}: <title>" && git push
 ```
 
 GitHub Actions builds and deploys on push to `main`.
@@ -123,7 +123,10 @@ variants) and strips Obsidian wikilink and image-embed syntax.
 
 ### Book covers
 
-Covers are fetched from OpenLibrary at build time, opt-in:
+Every review should display a real book cover whenever one is discoverable. Cover
+lookup is best-effort and must never block publishing a review.
+
+Covers are fetched from Open Library at build time, opt-in locally:
 
 ```bash
 BOOKS_FETCH_COVERS=1 cargo run --release -- --generate-static
@@ -132,11 +135,14 @@ BOOKS_FETCH_COVERS=1 cargo run --release -- --generate-static
 Strategy:
 
 - `public/covers/<slug>.jpg` exists → use it (no network call)
-- `public/covers/<slug>.miss` exists → known to be uncovered, skip
-- Else: query `openlibrary.org/search.json`, pluck `cover_i`, fetch
-  `covers.openlibrary.org/b/id/<id>-L.jpg`, write the JPG (or `.miss` marker)
+- Else: search multiple Open Library results by title and author, then retry by
+  title, fetch `covers.openlibrary.org/b/id/<id>-L.jpg`, and write the JPG
+- If no cover is found or the service is unavailable, publish without a cover
+  and retry on a future cover-enabled build; do not create permanent miss markers
 
-Commit the `public/covers/` directory so subsequent builds don't re-fetch.
+Commit fetched files in `public/covers/` so subsequent builds don't re-fetch.
+The generator resolves covers before copying `public/`, ensuring a newly fetched
+image is included in the same static artifact.
 
 ### Semantic markup layers (matches everythingsings.github.io)
 
@@ -161,7 +167,8 @@ Commit the `public/covers/` directory so subsequent builds don't re-fetch.
 
 ## Deployment
 
-`.github/workflows/deploy.yml` runs `cargo test`, `cargo build --release`,
-`./target/release/books --generate-static`, then uploads `target/site/` as a
-Pages artifact. DNS `CNAME` for `books.everythingsings.art` must point at
+`.github/workflows/deploy.yml` runs `cargo test`, `cargo build --release`, then
+generates the site with `BOOKS_FETCH_COVERS=1`. Fetched covers are cached between
+workflow runs and included in the Pages artifact. A failed lookup does not fail
+the deployment. DNS `CNAME` for `books.everythingsings.art` must point at
 `<github-username>.github.io` (or to the Pages CNAME).
