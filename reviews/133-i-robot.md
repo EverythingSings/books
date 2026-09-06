@@ -3,6 +3,7 @@ number = 133
 title = "I, Robot"
 author = "Isaac Asimov"
 date = "2026-08-26"
+link = "https://www.penguinrandomhouse.com/books/5681/i-robot-by-isaac-asimov/paperback/"
 tags = ["Science Fiction", "Short Stories", "Robotics", "Artificial Intelligence"]
 +++
 

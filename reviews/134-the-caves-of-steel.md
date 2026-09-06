@@ -3,6 +3,7 @@ number = 134
 title = "The Caves of Steel"
 author = "Isaac Asimov"
 date = "2026-09-03"
+link = "https://www.penguinrandomhouse.com/books/5630/the-caves-of-steel-by-isaac-asimov/paperback/"
 tags = ["Science Fiction", "Mystery", "Robotics", "Artificial Intelligence"]
 +++
 

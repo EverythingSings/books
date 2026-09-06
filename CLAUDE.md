@@ -77,20 +77,27 @@ title = "Sapiens"
 author = "Yuval Noah Harari"
 date = "2019-01-09"
 date_raw = "1-09-19"               # optional — preserved from the original source
-link = "https://www.ynharari.com/book/sapiens/"   # optional
+link = "https://www.ynharari.com/book/sapiens/"   # required for new reviews
 tags = ["Nonfiction", "History"]  # optional subject/genre labels
 +++
 
 The review body, in markdown.
 ```
 
-`date_raw` and `link` are optional. `author` may be empty (e.g. autobiographies).
+`date_raw` is optional. `author` may be empty (e.g. autobiographies).
+Every new review must include a verified `link` to the book's source page,
+preferably the author's or publisher's official book page. This renders as the
+`source` link beside the review date. The parser remains compatible with older
+entries that lack links; do not omit the source link when adding or completing a review.
 `tags` defaults to an empty list. Tags appear on review pages, in HTML and JSON-LD
 metadata, as RSS categories, and in the full-text export. The index table of
 contents links to the first review of each year, derived from completion dates.
 Filename `NNN-slug.md` controls the URL slug; `NNN` is zero-padded for natural sort.
 
 ### Adding a new review (the daily workflow)
+
+Before publishing, verify the book's source URL and confirm that its `source`
+link appears beside the date on the generated review page.
 
 ```bash
 # pick the next number

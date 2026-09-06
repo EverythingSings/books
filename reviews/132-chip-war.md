@@ -3,6 +3,7 @@ number = 132
 title = "Chip War"
 author = "Chris Miller"
 date = "2026-08-15"
+link = "https://www.simonandschuster.com/books/Chip-War/Chris-Miller/9781982172008"
 tags = ["Nonfiction", "Technology", "History", "Geopolitics", "Semiconductors"]
 +++
 
