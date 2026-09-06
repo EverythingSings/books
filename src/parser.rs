@@ -17,6 +17,8 @@ struct Frontmatter {
     pub _date_raw: String,
     #[serde(default)]
     pub link: String,
+    #[serde(default)]
+    pub tags: Vec<String>,
     /// Set `retroactive = true` when the review was written some time after the
     /// book was read (e.g. backfilled long afterwards). Surfaces a small badge.
     #[serde(default)]
@@ -33,11 +35,12 @@ pub struct Review {
     pub number: u32,
     pub title: String,
     pub author: String,
-    pub date: String,        // YYYY-MM-DD — date the book was finished
-    pub date_display: String, // human-friendly, e.g. "January 9, 2019"
+    pub date: String,             // YYYY-MM-DD — date the book was finished
+    pub date_display: String,     // human-friendly, e.g. "January 9, 2019"
     pub reviewed: String,         // YYYY-MM-DD the review was written; empty if same as `date`
     pub reviewed_display: String, // human-friendly form of `reviewed`; empty if none
     pub link: String,
+    pub tags: Vec<String>,
     pub slug: String,
     pub body_html: String,
     pub body_text: String, // plaintext for description/feed
@@ -63,7 +66,10 @@ pub fn load_all(dir: &Path) -> std::io::Result<Vec<Review>> {
         if let Some(review) = parse_one(&path, &text) {
             out.push(review);
         } else {
-            eprintln!("warning: skipping malformed review file: {}", path.display());
+            eprintln!(
+                "warning: skipping malformed review file: {}",
+                path.display()
+            );
         }
     }
     // Sort by review number (oldest first; matches original chronological order).
@@ -77,7 +83,10 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
     let slug = path
         .file_stem()
         .and_then(|s| s.to_str())
-        .map(|s| s.trim_start_matches(|c: char| c.is_ascii_digit() || c == '-').to_string())
+        .map(|s| {
+            s.trim_start_matches(|c: char| c.is_ascii_digit() || c == '-')
+                .to_string()
+        })
         .unwrap_or_default();
     let slug = if slug.is_empty() {
         slugify(&fm.title)
@@ -110,6 +119,7 @@ fn parse_one(path: &Path, text: &str) -> Option<Review> {
         reviewed,
         reviewed_display,
         link: fm.link,
+        tags: fm.tags,
         slug,
         body_html,
         body_text,
@@ -190,7 +200,11 @@ pub fn today_display() -> String {
 /// Unix epoch (1970-01-01) to a (year, month, day) Gregorian triple.
 fn civil_from_days(z: i64) -> (i32, u32, u32) {
     let z = z + 719_468;
-    let era = if z >= 0 { z / 146_097 } else { (z - 146_096) / 146_097 };
+    let era = if z >= 0 {
+        z / 146_097
+    } else {
+        (z - 146_096) / 146_097
+    };
     let doe = z - era * 146_097;
     let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
     let y = yoe + era * 400;
@@ -212,9 +226,18 @@ fn format_date(iso: &str) -> String {
     let month: usize = parts[1].parse().unwrap_or(0);
     let day = parts[2];
     let name = match month {
-        1 => "January", 2 => "February", 3 => "March", 4 => "April",
-        5 => "May", 6 => "June", 7 => "July", 8 => "August",
-        9 => "September", 10 => "October", 11 => "November", 12 => "December",
+        1 => "January",
+        2 => "February",
+        3 => "March",
+        4 => "April",
+        5 => "May",
+        6 => "June",
+        7 => "July",
+        8 => "August",
+        9 => "September",
+        10 => "October",
+        11 => "November",
+        12 => "December",
         _ => return iso.to_string(),
     };
     let d: u32 = day.parse().unwrap_or(0);
@@ -295,7 +318,9 @@ mod tests {
         assert!(is_pending("Review pending."));
         assert!(is_pending("  review pending  "));
         assert!(!is_pending("This book was a delight to read."));
-        assert!(!is_pending("Review pending, more soon — but here's a thought."));
+        assert!(!is_pending(
+            "Review pending, more soon — but here's a thought."
+        ));
     }
 
     #[test]

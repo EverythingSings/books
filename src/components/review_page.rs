@@ -22,6 +22,7 @@ pub fn ReviewPage(
     let show_reviewed = review.retroactive && !reviewed_display.is_empty();
     let n = review.number;
     let link = review.link.clone();
+    let tags = review.tags.clone();
     let cover = cover_path;
     // Two-column (cover beside text) only when a cover exists; otherwise the
     // text column stands alone at normal reading width.
@@ -95,6 +96,13 @@ pub fn ReviewPage(
                                         <a class="external" href=link.clone() rel="noopener external">"\u{2197} source"</a>
                                     })}
                                 </p>
+                                {(!tags.is_empty()).then(|| view! {
+                                    <ul class="review-tags" aria-label="Book tags">
+                                        {tags.into_iter().map(|tag| view! {
+                                            <li itemprop="keywords">{tag}</li>
+                                        }).collect::<Vec<_>>()}
+                                    </ul>
+                                })}
                             </header>
                             <div class="review-body" itemprop="reviewBody" inner_html=body_html></div>
                         </div>

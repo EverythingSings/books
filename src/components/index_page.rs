@@ -3,6 +3,7 @@
 use crate::components::head::html_escape;
 use crate::parser::{today_display, Review};
 use leptos::prelude::*;
+use std::collections::BTreeSet;
 
 /// Inline line-icon for a not-yet-written review (a dashed, hollow ring).
 const ICON_PENDING: &str = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" \
@@ -37,48 +38,25 @@ fn truncate_excerpt(text: &str, chars: usize) -> String {
     }
 }
 
-/// Reading eras, each anchored to the first review whose year falls within it.
-/// `start_year` partitions the timeline: a review belongs to the latest era
-/// whose `start_year` is <= the review's year.
-struct Era {
-    start_year: u32,
-    years: &'static str,
-    desc: &'static str,
-}
-
-const ERAS: &[Era] = &[
-    Era { start_year: 2019, years: "2019–2020", desc: "philosophy & self-discovery" },
-    Era { start_year: 2020, years: "2020–2022", desc: "deep sci-fi immersion" },
-    Era { start_year: 2023, years: "2023–2024", desc: "AI, design & creativity" },
-    Era { start_year: 2024, years: "2024–2025", desc: "the inward turn" },
-];
-
-/// Year (first four chars of the ISO date) → index into `ERAS`.
-fn era_index(date: &str) -> usize {
-    let year: u32 = date.get(..4).and_then(|y| y.parse().ok()).unwrap_or(0);
-    ERAS.iter()
-        .rposition(|e| e.start_year <= year)
-        .unwrap_or(0)
-}
-
 #[component]
 pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
     let total = reviews.len();
     let last_updated = today_display();
 
-    // The first review in each era gets an `id="era-N"` anchor so the header
-    // links can jump straight to that section. `anchored[i]` is the era index
-    // to stamp on entry `i`, if it's the first entry of its era.
-    let mut anchored: Vec<Option<usize>> = vec![None; reviews.len()];
-    let mut seen = [false; 8];
-    for (i, r) in reviews.iter().enumerate() {
-        let e = era_index(&r.date);
-        if !seen[e] {
-            seen[e] = true;
-            anchored[i] = Some(e);
-        }
-    }
-    let era_present = seen;
+    // Each year links to its first review. Derive years from the dates so new
+    // years appear automatically, without duplicate anchors or empty sections.
+    let mut years = BTreeSet::new();
+    let anchored: Vec<Option<String>> = reviews
+        .iter()
+        .map(|review| {
+            let year = review.date.get(..4)?;
+            if year.bytes().all(|c| c.is_ascii_digit()) && years.insert(year.to_string()) {
+                Some(format!("year-{year}"))
+            } else {
+                None
+            }
+        })
+        .collect();
 
     let entries: Vec<_> = reviews
         .iter()
@@ -90,26 +68,35 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
             let date = r.date_display.clone();
             let n = r.number;
             let preview = truncate_excerpt(&r.body_text, 220);
-            let anchor = anchored[i].map(|e| format!("era-{e}"));
+            let anchor = anchored[i].clone();
             // Pending takes precedence: a stub has no review, so it can't be
             // "retroactive" (the parser already enforces this).
             let status = if r.pending {
-                Some(view! {
-                    <span class="entry-status pending" role="img"
-                        aria-label="Review pending" title="Review pending"
-                        inner_html=ICON_PENDING></span>
-                }.into_any())
+                Some(
+                    view! {
+                        <span class="entry-status pending" role="img"
+                            aria-label="Review pending" title="Review pending"
+                            inner_html=ICON_PENDING></span>
+                    }
+                    .into_any(),
+                )
             } else if r.retroactive {
                 let label = if r.reviewed_display.is_empty() {
                     "Retroactive review".to_string()
                 } else {
-                    format!("Finished {}, reviewed {}", r.date_display, r.reviewed_display)
+                    format!(
+                        "Finished {}, reviewed {}",
+                        r.date_display, r.reviewed_display
+                    )
                 };
-                Some(view! {
-                    <span class="entry-status retroactive" role="img"
-                        aria-label=label.clone() title=label
-                        inner_html=ICON_RETRO></span>
-                }.into_any())
+                Some(
+                    view! {
+                        <span class="entry-status retroactive" role="img"
+                            aria-label=label.clone() title=label
+                            inner_html=ICON_RETRO></span>
+                    }
+                    .into_any(),
+                )
             } else {
                 None
             };
@@ -129,25 +116,11 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
         })
         .collect();
 
-    let eras: Vec<_> = ERAS
-        .iter()
-        .enumerate()
-        .map(|(e, era)| {
-            let years = era.years;
-            let desc = era.desc;
-            // Only link eras that actually contain a review.
-            if era_present[e] {
-                let target = format!("#era-{e}");
-                view! {
-                    <div class="era-row">
-                        <dt><a class="era-link" href=target.clone()>{years}</a></dt>
-                        <dd><a class="era-link" href=target>{desc}</a></dd>
-                    </div>
-                }
-                .into_any()
-            } else {
-                view! { <div class="era-row"><dt>{years}</dt><dd>{desc}</dd></div> }.into_any()
-            }
+    let year_links: Vec<_> = years
+        .into_iter()
+        .map(|year| {
+            let target = format!("#year-{year}");
+            view! { <li><a href=target>{year}</a></li> }
         })
         .collect();
 
@@ -172,9 +145,10 @@ pub fn IndexPage(reviews: Vec<Review>) -> impl IntoView {
                         <p class="hero-about">
                             "Books are a form of time travel. Open one and you\u{2019}re inside a mind from two hundred years ago, or a thousand. Writing about what I read is another layer of that. These reviews are what I send forward. Layered time travel."
                         </p>
-                        <dl class="era-list">
-                            {eras}
-                        </dl>
+                        <nav class="year-nav" aria-labelledby="year-nav-title">
+                            <h2 id="year-nav-title">"Contents by year"</h2>
+                            <ol class="year-links">{year_links}</ol>
+                        </nav>
                         <p class="hero-updated">
                             <span class="hero-updated-label">"Last updated"</span>
                             <span class="hero-updated-date">{last_updated}</span>

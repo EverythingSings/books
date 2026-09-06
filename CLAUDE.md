@@ -78,12 +78,16 @@ author = "Yuval Noah Harari"
 date = "2019-01-09"
 date_raw = "1-09-19"               # optional — preserved from the original source
 link = "https://www.ynharari.com/book/sapiens/"   # optional
+tags = ["Nonfiction", "History"]  # optional subject/genre labels
 +++
 
 The review body, in markdown.
 ```
 
 `date_raw` and `link` are optional. `author` may be empty (e.g. autobiographies).
+`tags` defaults to an empty list. Tags appear on review pages, in HTML and JSON-LD
+metadata, as RSS categories, and in the full-text export. The index table of
+contents links to the first review of each year, derived from completion dates.
 Filename `NNN-slug.md` controls the URL slug; `NNN` is zero-padded for natural sort.
 
 ### Adding a new review (the daily workflow)

@@ -12,9 +12,23 @@ pub struct PageMeta {
     pub og_type: String,
     pub og_image: String,
     pub json_ld: String,
+    pub tags: Vec<String>,
 }
 
 pub fn generate_head_html(meta: &PageMeta) -> String {
+    let mut tag_meta = String::new();
+    if !meta.tags.is_empty() {
+        tag_meta.push_str(&format!(
+            "<meta name=\"keywords\" content=\"{}\" />\n",
+            html_escape(&meta.tags.join(", "))
+        ));
+        for tag in &meta.tags {
+            tag_meta.push_str(&format!(
+                "<meta property=\"article:tag\" content=\"{}\" />\n",
+                html_escape(tag)
+            ));
+        }
+    }
     format!(
         r#"<head>
 <meta charset="utf-8" />
@@ -22,7 +36,7 @@ pub fn generate_head_html(meta: &PageMeta) -> String {
 <title>{title}</title>
 <meta name="description" content="{description}" />
 <meta name="author" content="{author}" />
-<link rel="canonical" href="{url}" />
+{tag_meta}<link rel="canonical" href="{url}" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -53,6 +67,7 @@ pub fn generate_head_html(meta: &PageMeta) -> String {
         author = SITE_AUTHOR,
         site_name = SITE_NAME,
         json_ld = meta.json_ld,
+        tag_meta = tag_meta,
     )
 }
 
@@ -83,13 +98,18 @@ pub fn review_json_ld(
     date: &str,
     body_excerpt: &str,
     canonical_url: &str,
+    tags: &[String],
 ) -> String {
+    let keywords = serde_json::to_string(tags)
+        .expect("string tags serialize to JSON")
+        .replace('<', "\\u003c");
     format!(
         r#"{{
   "@context": "https://schema.org",
   "@type": "Review",
   "url": "{url}",
   "datePublished": "{date}",
+  "keywords": {keywords},
   "author": {{
     "@type": "Person",
     "name": "{reviewer}",
@@ -111,6 +131,7 @@ pub fn review_json_ld(
         title = json_escape(title),
         book_author = json_escape(author),
         excerpt = json_escape(body_excerpt),
+        keywords = keywords,
     )
 }
 
@@ -141,6 +162,7 @@ mod tests {
             og_type: "article".into(),
             og_image: "https://books.everythingsings.art/covers/sapiens.jpg".into(),
             json_ld: "{}".into(),
+            tags: vec![],
         };
         let html = generate_head_html(&meta);
         assert!(html.contains("<title>Sapiens</title>"));

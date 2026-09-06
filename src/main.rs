@@ -134,6 +134,7 @@ fn render_index_page(reviews: &[Review]) -> String {
         og_type: "website".to_string(),
         og_image: format!("{SITE_URL}/header.jpg"),
         json_ld: site_index_json_ld(),
+        tags: vec![],
     });
     let body = IndexPage(IndexPageProps {
         reviews: reviews.to_vec(),
@@ -180,6 +181,7 @@ fn render_review_page(
         published,
         &excerpt,
         &canonical,
+        &review.tags,
     );
     let head = generate_head_html(&PageMeta {
         title: format!("{} — {}", review.title, SITE_NAME),
@@ -188,6 +190,7 @@ fn render_review_page(
         og_type: "article".to_string(),
         og_image,
         json_ld,
+        tags: review.tags.clone(),
     });
     let body = ReviewPage(ReviewPageProps {
         review: review.clone(),
@@ -235,8 +238,13 @@ fn generate_feed(reviews: &[Review]) -> String {
         ));
         let desc = xml_escape(&r.body_text.chars().take(500).collect::<String>());
         let pub_date = rfc822_date(&r.date);
+        let categories: String = r
+            .tags
+            .iter()
+            .map(|tag| format!("    <category>{}</category>\n", xml_escape(tag)))
+            .collect();
         items.push_str(&format!(
-            "  <item>\n    <title>{title}</title>\n    <link>{url}</link>\n    <guid>{url}</guid>\n    <pubDate>{pub_date}</pubDate>\n    <description>{desc}</description>\n  </item>\n"
+            "  <item>\n    <title>{title}</title>\n    <link>{url}</link>\n    <guid>{url}</guid>\n    <pubDate>{pub_date}</pubDate>\n    <description>{desc}</description>\n{categories}  </item>\n"
         ));
     }
     format!(
@@ -270,6 +278,9 @@ fn generate_llms_full_txt(reviews: &[Review]) -> String {
             out.push_str(&format!("- Author: {}\n", r.author));
         }
         out.push_str(&format!("- Finished: {}\n", r.date));
+        if !r.tags.is_empty() {
+            out.push_str(&format!("- Tags: {}\n", r.tags.join(", ")));
+        }
         if !r.reviewed.is_empty() {
             out.push_str(&format!("- Reviewed: {}\n", r.reviewed));
         }
